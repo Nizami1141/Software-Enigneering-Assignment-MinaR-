@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MinaR · Clearance Reports API</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, sans-serif;
+      color: #162c29;
+      background: #f3f6f3;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.55; }
+    .container { width: min(68rem, 100% - 2rem); margin-inline: auto; }
+    header { padding: clamp(2.25rem, 7vw, 4.5rem) 0; background: #102e29; color: #f7fffa; }
+    header p { max-width: 38rem; color: #cbdfd7; }
+    h1, h2, p { margin: 0; }
+    h1 { margin-block: .6rem; font-size: clamp(2.15rem, 6vw, 3.6rem); line-height: 1.13; }
+    h2 { margin-bottom: 1rem; font-size: 1.4rem; }
+    .status { display: flex; gap: .55rem; align-items: center; font-size: .9rem; color: #bce9cf; }
+    .status::before { content: ""; width: .6rem; height: .6rem; border-radius: 50%; background: #8ce5ad; }
+    .docs { display: inline-block; margin-top: 1.25rem; color: #a9edc4; text-underline-offset: .2em; }
+    main { display: grid; gap: 1.5rem; padding-block: 1.75rem 3rem; }
+    section { padding: clamp(1rem, 3vw, 1.6rem); border: 1px solid #dce6df; border-radius: .85rem; background: #fff; }
+    ul { margin: 0; padding: 0; list-style: none; }
+    .endpoints li { display: grid; grid-template-columns: 5rem minmax(0, 1.4fr) minmax(0, 1fr); gap: .75rem; align-items: baseline; padding: .65rem 0; }
+    .endpoints li + li { border-top: 1px solid #e7eee9; }
+    .method { color: #176244; font-weight: 700; font-size: .8rem; }
+    code { overflow-wrap: anywhere; font: .875rem/1.4 ui-monospace, monospace; }
+    .team { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+    .team li { padding: .9rem 1rem; border-radius: .55rem; background: #f2f7f3; }
+    .student-id { display: block; margin-bottom: .4rem; font-size: .82rem; color: #47635a; }
+    @media (max-width: 44rem) {
+      .endpoints li { grid-template-columns: 3.6rem minmax(0, 1fr); gap: .25rem .45rem; }
+      .endpoints p { grid-column: 2; }
+      .team { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <p class="status">API running · v1</p>
+      <h1>MinaR Clearance Reports</h1>
+      <p>MinaR helps demining coordinators and analysts track field progress.
+        This prototype lets users create, review, and manage fictional progress reports.</p>
+      <a class="docs" href="./docs">Open interactive API docs</a>
+    </div>
+  </header>
+  <main class="container">
+    <section aria-labelledby="endpoints">
+      <h2 id="endpoints">Available endpoints</h2>
+      <ul class="endpoints">
+        <li><span class="method">GET</span><code>/api/v1/clearance-reports</code><p>List reports you can access.</p></li>
+        <li><span class="method">GET</span><code>/api/v1/clearance-reports/{id}</code><p>Read one report.</p></li>
+        <li><span class="method">POST</span><code>/api/v1/clearance-reports</code><p>Create a report.</p></li>
+        <li><span class="method">PUT</span><code>/api/v1/clearance-reports/{id}</code><p>Replace a report’s editable fields.</p></li>
+        <li><span class="method">DELETE</span><code>/api/v1/clearance-reports/{id}</code><p>Delete a report.</p></li>
+        <li><span class="method">GET</span><code>/api/v1/greeting</code><p>View the project and team overview.</p></li>
+      </ul>
+    </section>
+    <section aria-labelledby="team">
+      <h2 id="team">Project team</h2>
+      <ul class="team">
+        <li>
+          <strong>Elvin Azizli</strong>
+          <span class="student-id">Student ID pending</span>
+          <p>Project architecture and FastAPI backend.</p>
+        </li>
+        <li>
+          <strong>Nizami Guliyev</strong>
+          <span class="student-id">Student ID pending</span>
+          <p>Database design, logging and alert planning.</p>
+        </li>
+        <li>
+          <strong>Ramil Khaspoladov</strong>
+          <span class="student-id">Student ID pending</span>
+          <p>UI components and client-side data handling.</p>
+        </li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
