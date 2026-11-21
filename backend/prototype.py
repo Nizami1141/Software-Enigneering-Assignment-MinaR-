@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from api.clearance_reports import initial_reports, router as reports_router
+from api.greeting import router as greeting_router
 from api.prototype_errors import register_error_handlers
 
 
@@ -9,6 +10,7 @@ def create_prototype_api() -> FastAPI:
     api.state.reports = initial_reports()
     register_error_handlers(api, reports_router)
     api.include_router(reports_router)
+    api.include_router(greeting_router)
     return api
 
 

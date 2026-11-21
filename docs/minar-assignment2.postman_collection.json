@@ -1,0 +1,486 @@
+{
+  "info": {
+    "name": "MinaR Clearance Reports API",
+    "description": "Start the FastAPI prototype before running this collection. Run the CRUD folder in order so the create request can save the generated report ID for the remaining requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000/api/v1"
+    },
+    {
+      "key": "userAToken",
+      "value": "user-a-token"
+    },
+    {
+      "key": "userBToken",
+      "value": "user-b-token"
+    },
+    {
+      "key": "adminToken",
+      "value": "admin-token"
+    },
+    {
+      "key": "reportId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Report CRUD",
+      "item": [
+        {
+          "name": "List reports as user A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Shows one of user A's reports\", function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.data).to.have.lengthOf(1);",
+                  "  pm.expect(response.data[0].ownerId).to.eql(\"user-a\");",
+                  "  pm.expect(response.meta.perPage).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports?page=1&perPage=1"
+          }
+        },
+        {
+          "name": "Create a report as A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Save the new report ID for the next requests\", function () {",
+                  "  const report = pm.response.json().data;",
+                  "  pm.expect(report.id).to.be.a(\"string\").and.not.empty;",
+                  "  pm.collectionVariables.set(\"reportId\", report.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sectorName\": \"Demo Sector A3\",\n  \"summary\": \"Drafted an end-of-week report.\",\n  \"status\": \"draft\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Read the created report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns the created report\", function () {",
+                  "  pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get(\"reportId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/{{reportId}}"
+          }
+        },
+        {
+          "name": "Update the created report as A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Report status is submitted\", function () {",
+                  "  pm.expect(pm.response.json().data.status).to.eql(\"submitted\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/{{reportId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sectorName\": \"Demo Sector A3\",\n  \"summary\": \"Submitted the end-of-week report.\",\n  \"status\": \"submitted\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete the created report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Delete returns null data\", function () {",
+                  "  pm.expect(pm.response.json().data).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/{{reportId}}"
+          }
+        },
+        {
+          "name": "Read the deleted report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Returns NOT_FOUND\", function () {",
+                  "  pm.expect(pm.response.json().error.code).to.eql(\"NOT_FOUND\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/{{reportId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Access and errors",
+      "item": [
+        {
+          "name": "Missing token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Returns UNAUTHORIZED\", function () {",
+                  "  pm.expect(pm.response.json().error.code).to.eql(\"UNAUTHORIZED\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/clearance-reports"
+          }
+        },
+        {
+          "name": "Invalid token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Returns UNAUTHORIZED\", function () {",
+                  "  pm.expect(pm.response.json().error.code).to.eql(\"UNAUTHORIZED\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid-token"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports"
+          }
+        },
+        {
+          "name": "User A cannot read user B's report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Returns FORBIDDEN\", function () {",
+                  "  pm.expect(pm.response.json().error.code).to.eql(\"FORBIDDEN\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/cr-201"
+          }
+        },
+        {
+          "name": "User B cannot delete user A's report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Returns FORBIDDEN\", function () {",
+                  "  pm.expect(pm.response.json().error.code).to.eql(\"FORBIDDEN\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userBToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/cr-101"
+          }
+        },
+        {
+          "name": "Admin can read user B's report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Report belongs to user B\", function () {",
+                  "  pm.expect(pm.response.json().data.ownerId).to.eql(\"user-b\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/cr-201"
+          }
+        },
+        {
+          "name": "Missing summary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Returns VALIDATION_ERROR\", function () {",
+                  "  pm.expect(pm.response.json().error.code).to.eql(\"VALIDATION_ERROR\");",
+                  "});",
+                  "pm.test(\"The validation error identifies summary\", function () {",
+                  "  const fields = pm.response.json().error.details.map(detail => detail.field);",
+                  "  pm.expect(fields).to.include(\"summary\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sectorName\": \"Demo Sector A3\",\n  \"status\": \"draft\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Unsupported HTTP method",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 405\", function () {",
+                  "  pm.response.to.have.status(405);",
+                  "});",
+                  "pm.test(\"Returns METHOD_NOT_ALLOWED\", function () {",
+                  "  pm.expect(pm.response.json().error.code).to.eql(\"METHOD_NOT_ALLOWED\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/clearance-reports/cr-101"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public greeting page",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Returns the HTML greeting page\", function () {",
+              "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.match(/^text\\/html/i);",
+              "  pm.expect(pm.response.text()).to.include(\"MinaR Clearance Reports\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/greeting"
+      }
+    }
+  ]
+}
