@@ -1,0 +1,72 @@
+@base = http://127.0.0.1:8000/api/v1
+@userA = user-a-token
+@userB = user-b-token
+@admin = admin-token
+
+### List reports visible to A (200)
+GET {{base}}/clearance-reports?page=1&perPage=1
+Authorization: Bearer {{userA}}
+
+### List all initial reports as admin (200)
+GET {{base}}/clearance-reports
+Authorization: Bearer {{admin}}
+
+### Create a report as A (201)
+# @name createdReport
+POST {{base}}/clearance-reports
+Authorization: Bearer {{userA}}
+Content-Type: application/json
+
+{"sectorName":"Demo Sector A3","summary":"Drafted an end-of-week report.","status":"draft"}
+
+### Read the created report as A (200)
+GET {{base}}/clearance-reports/{{createdReport.response.body.$.data.id}}
+Authorization: Bearer {{userA}}
+
+### Update the created report as A (200)
+PUT {{base}}/clearance-reports/{{createdReport.response.body.$.data.id}}
+Authorization: Bearer {{userA}}
+Content-Type: application/json
+
+{"sectorName":"Demo Sector A3","summary":"Submitted the end-of-week report.","status":"submitted"}
+
+### Delete the created report as A (200)
+DELETE {{base}}/clearance-reports/{{createdReport.response.body.$.data.id}}
+Authorization: Bearer {{userA}}
+
+### Read a permanently absent example ID (404)
+GET {{base}}/clearance-reports/cr-missing
+Authorization: Bearer {{userA}}
+
+### Missing token (401)
+GET {{base}}/clearance-reports
+
+### Invalid token (401)
+GET {{base}}/clearance-reports
+Authorization: Bearer invalid-token
+
+### A cannot read a report owned by B (403)
+GET {{base}}/clearance-reports/cr-201
+Authorization: Bearer {{userA}}
+
+### B cannot delete a report owned by A (403)
+DELETE {{base}}/clearance-reports/cr-101
+Authorization: Bearer {{userB}}
+
+### Admin can read a report owned by B (200)
+GET {{base}}/clearance-reports/cr-201
+Authorization: Bearer {{admin}}
+
+### Missing summary (400)
+POST {{base}}/clearance-reports
+Authorization: Bearer {{userA}}
+Content-Type: application/json
+
+{"sectorName":"Demo Sector A3","status":"draft"}
+
+### Unsupported method (405)
+PATCH {{base}}/clearance-reports/cr-101
+Authorization: Bearer {{userA}}
+
+### Greeting page (200, HTML)
+GET {{base}}/greeting
